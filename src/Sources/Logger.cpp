@@ -13,9 +13,7 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 	// 
 
 	if (InLogLevel < this->Config.MinimumLevel)
-	{
-		
-	}
+		return;
 	
 	// 
 	// Calculate the number of bytes required for the formatting.
