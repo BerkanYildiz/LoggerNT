@@ -5,6 +5,7 @@
 // 
 
 #include <ntdef.h>
+#include <ntifs.h>
 #include <tchar.h>
 #include <wdm.h>
 
@@ -29,4 +30,5 @@
 // Include the default logging providers.
 // 
 
-#include "DbgPrintProvider.hpp"
+#include "Providers/DbgPrintProvider.hpp"
+#include "Providers/TempFileProvider.hpp"

@@ -8,6 +8,19 @@
 /// <param name="...">The arguments for the message format.</param>
 void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 {
+	va_list Arguments;
+	__va_start(&Arguments, InFormat);
+	Logv(InLogLevel, InFormat, Arguments);
+}
+
+/// <summary>
+/// Logs a message of the specified log level.
+/// </summary>
+/// <param name="InLogLevel">The severity.</param>
+/// <param name="InFormat">The format of the message.</param>
+/// <param name="InArguments">The arguments for the message format.</param>
+void Logger::Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArguments)
+{
 	// 
 	// Check whether this log should be processed or not.
 	// 
@@ -19,15 +32,10 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 	// Calculate the number of bytes required for the formatting.
 	// 
 
-	va_list Arguments;
-	__va_start(&Arguments, InFormat);
-	auto const NumberOfCharactersRequired = _vscwprintf(InFormat, Arguments);
+	auto const NumberOfCharactersRequired = _vscwprintf(InFormat, InArguments);
 
 	if (NumberOfCharactersRequired < 0)
-	{
-		_crt_va_end(Arguments);
 		return;
-	}
 
 	// 
 	// Lock the logger, and check if we already have allocated enough memory for the formatting.
@@ -54,7 +62,6 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 			this->LogProcessBufferSize = 0;
 			this->LogProcessingBuffer = nullptr;
 			KeReleaseSpinLock(&LogProcessingLock, OldIrql);
-			_crt_va_end(Arguments);
 			return;
 		}
 	}
@@ -63,14 +70,12 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 	// Format the message and the arguments.
 	// 
 
-	if (vswprintf_s(this->LogProcessingBuffer, this->LogProcessBufferSize / sizeof(TCHAR), InFormat, Arguments) < 0)
+	if (vswprintf_s(this->LogProcessingBuffer, this->LogProcessBufferSize / sizeof(TCHAR), InFormat, InArguments) < 0)
 	{
 		KeReleaseSpinLock(&LogProcessingLock, OldIrql);
-		_crt_va_end(Arguments);
 		return;
 	}
 
-	_crt_va_end(Arguments);
 
 	// 
 	// Log the message.
@@ -87,4 +92,27 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 
 	KeReleaseSpinLock(&ProvidersLock, OldIrqlBis);
 	KeReleaseSpinLock(&LogProcessingLock, OldIrql);
+}
+
+void Tests_Example()
+{
+	auto Logger = ::Logger();
+
+	// Print with DbgPrintEx
+	Logger.AddProvider<DbgPrintProvider>();
+
+	// Write to a file
+	auto FileProvider = ::TempFileProvider(L"debug.log");
+	FileProvider.UseFileNamed(L"debug.log"); // or you can call a function instead of constructor
+	Logger.AddProvider<TempFileProvider>(&FileProvider);
+
+	// Log something explicitly
+	Logger.Log(ELogLevel::Debug, L"Example message one");
+
+	// Log using a level function
+	Logger.LogDebug(L"Example message one");
+
+	// Log with an error level
+	Logger.Log(ELogLevel::Error, L"Example message two");
+	Logger.LogError(L"Example message two");
 }

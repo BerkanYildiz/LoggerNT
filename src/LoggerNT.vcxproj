@@ -35,12 +35,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\DbgPrintProvider.hpp" />
+    <ClInclude Include="Headers\Providers\DbgPrintProvider.hpp" />
     <ClInclude Include="Headers\Logger.hpp" />
     <ClInclude Include="Headers\LoggerConfig.hpp" />
     <ClInclude Include="Headers\LoggerNtLib.hpp" />
     <ClInclude Include="Headers\LogLevel.hpp" />
     <ClInclude Include="Headers\LogProvider.hpp" />
+    <ClInclude Include="Headers\Providers\TempFileProvider.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Logger.cpp" />

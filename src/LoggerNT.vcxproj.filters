@@ -33,7 +33,10 @@
     <ClInclude Include="Headers\LogProvider.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\DbgPrintProvider.hpp">
+    <ClInclude Include="Headers\Providers\DbgPrintProvider.hpp">
+      <Filter>Header Files\Providers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Providers\TempFileProvider.hpp">
       <Filter>Header Files\Providers</Filter>
     </ClInclude>
   </ItemGroup>

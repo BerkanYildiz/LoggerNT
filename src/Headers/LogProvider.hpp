@@ -4,7 +4,7 @@
 /// The base interface every logging providers must implement and inherit from.
 /// </summary>
 __interface ILogProvider
-{	
+{
 	/// <summary>
 	/// Logs a message of the specified severity.
 	/// </summary>

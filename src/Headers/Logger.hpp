@@ -96,7 +96,7 @@ public:
 
 		KIRQL OldIrql;
 		KeAcquireSpinLock(&ProvidersLock, &OldIrql);
-		InterlockedExchangePointer(Providers[InterlockedIncrement(&NumberOfProviders) - 1], InProvider);
+		InterlockedExchangePointer((PVOID*) &Providers[InterlockedIncrement(&NumberOfProviders) - 1], InProvider);
 		KeReleaseSpinLock(&ProvidersLock, OldIrql);
 		return true;
 	}
@@ -108,4 +108,86 @@ public:
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
 	void Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...);
+	
+	/// <summary>
+	/// Logs a message of the specified log level.
+	/// </summary>
+	/// <param name="InLogLevel">The severity.</param>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="InArguments">The arguments for the message format.</param>
+	void Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArguments);
+
+public:
+
+	/// <summary>
+	/// Logs a message with the 'Trace' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogTrace(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Trace, InFormat, Arguments);
+	}
+
+	/// <summary>
+	/// Logs a message with the 'Debug' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogDebug(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Debug, InFormat, Arguments);
+	}
+
+	/// <summary>
+	/// Logs a message with the 'Information' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogInformation(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Information, InFormat, Arguments);
+	}
+
+	/// <summary>
+	/// Logs a message with the 'Warning' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogWarning(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Warning, InFormat, Arguments);
+	}
+
+	/// <summary>
+	/// Logs a message with the 'Error' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogError(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Error, InFormat, Arguments);
+	}
+
+	/// <summary>
+	/// Logs a message with the 'Fatal' severity level.
+	/// </summary>
+	/// <param name="InFormat">The format of the message.</param>
+	/// <param name="...">The arguments for the message format.</param>
+	void LogFatal(const TCHAR* InFormat, ...)
+	{
+		va_list Arguments;
+		__va_start(&Arguments, InFormat);
+		Logv(ELogLevel::Fatal, InFormat, Arguments);
+	}
 };
