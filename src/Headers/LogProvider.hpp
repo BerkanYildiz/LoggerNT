@@ -10,5 +10,5 @@ __interface ILogProvider
 	/// </summary>
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InMessage">The message.</param>
-	void Log(ELogLevel InLogLevel, const TCHAR* InMessage);
+	void Log(ELogLevel InLogLevel, const WCHAR* InMessage);
 };

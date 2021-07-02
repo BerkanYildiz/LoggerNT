@@ -97,7 +97,7 @@ public:
 	/// </summary>
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InMessage">The message.</param>
-	void Log(ELogLevel InLogLevel, const TCHAR* InMessage) override
+	void Log(ELogLevel InLogLevel, const WCHAR* InMessage) override
 	{
 		UNREFERENCED_PARAMETER(InLogLevel);
 		
@@ -137,18 +137,18 @@ public:
 			AnsiMessage.Length = 0;
 			AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength;
 			
-			if (!NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessage, &UnicodeMessage, false)))
-				return;
+			if (NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessage, &UnicodeMessage, false)))
+			{
+				// 
+				// Write the message to a file on disk.
+				// 
 
-			// 
-			// Writes the message to a file on disk.
-			// 
+				IO_STATUS_BLOCK IoStatusBlock = { };
 
-			IO_STATUS_BLOCK IoStatusBlock = { };
+				if (NT_SUCCESS(ZwWriteFile(FileHandle, NULL, NULL, NULL, &IoStatusBlock, AnsiMessage.Buffer, AnsiMessage.Length, NULL, NULL)))
+					ZwFlushBuffersFile(FileHandle, &IoStatusBlock);
+			}
 
-			if (NT_SUCCESS(ZwWriteFile(FileHandle, NULL, NULL, NULL, &IoStatusBlock, AnsiMessage.Buffer, AnsiMessage.Length, NULL, NULL)))
-				ZwFlushBuffersFile(FileHandle, &IoStatusBlock);
-			
 			// 
 			// Release the memory allocated for the conversion.
 			// 
@@ -167,7 +167,7 @@ public:
 			UnicodeMessage.MaximumLength = UnicodeMessage.Length + (1 * sizeof(WCHAR));
 			
 			// 
-			// Writes the message to a file on disk.
+			// Write the message to a file on disk.
 			// 
 
 			IO_STATUS_BLOCK IoStatusBlock = { };

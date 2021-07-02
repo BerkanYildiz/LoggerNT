@@ -9,7 +9,7 @@ public:
 	/// </summary>
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InMessage">The message.</param>
-	void Log(ELogLevel InLogLevel, const TCHAR* InMessage) override
+	void Log(ELogLevel InLogLevel, const WCHAR* InMessage) override
 	{
 		// 
 		// Convert the UNICODE string to a ANSI string.
