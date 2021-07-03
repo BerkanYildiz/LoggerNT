@@ -1,4 +1,4 @@
-#include "../Headers/LoggerNtLib.hpp"
+#include "../Headers/LoggerNT.h"
 
 /// <summary>
 /// Logs a message of the specified severity.
@@ -6,10 +6,10 @@
 /// <param name="InLogLevel">The severity.</param>
 /// <param name="InFormat">The format of the message.</param>
 /// <param name="...">The arguments for the message format.</param>
-void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
+void Logger::Log(ELogLevel InLogLevel, const WCHAR* InFormat, ...)
 {
 	va_list Arguments;
-	__va_start(&Arguments, InFormat);
+	va_start(Arguments, InFormat);
 	Logv(InLogLevel, InFormat, Arguments);
 }
 
@@ -19,7 +19,7 @@ void Logger::Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...)
 /// <param name="InLogLevel">The severity.</param>
 /// <param name="InFormat">The format of the message.</param>
 /// <param name="InArguments">The arguments for the message format.</param>
-void Logger::Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArguments)
+void Logger::Logv(ELogLevel InLogLevel, const WCHAR* InFormat, va_list InArguments)
 {
 	// 
 	// Check whether this log should be processed or not.
@@ -31,7 +31,7 @@ void Logger::Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArgumen
 	// 
 	// Calculate the number of bytes required for the formatting.
 	// 
-
+	
 	auto const NumberOfCharactersRequired = _vscwprintf(InFormat, InArguments);
 
 	if (NumberOfCharactersRequired < 0)
@@ -45,13 +45,13 @@ void Logger::Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArgumen
 	KeAcquireSpinLock(&LogProcessingLock, &OldIrql);
 
 	if (this->LogProcessingBuffer == nullptr ||
-		this->LogProcessBufferSize < (NumberOfCharactersRequired + 1) * sizeof(TCHAR))
+		this->LogProcessBufferSize < (NumberOfCharactersRequired + 1) * sizeof(WCHAR))
 	{
 		if (this->LogProcessingBuffer != nullptr)
 			ExFreePoolWithTag(this->LogProcessingBuffer, 'Log ');
 		
-		this->LogProcessBufferSize = (NumberOfCharactersRequired + 1) * sizeof(TCHAR);
-		this->LogProcessingBuffer = (TCHAR*) ExAllocatePoolZero(NonPagedPoolNx, this->LogProcessBufferSize, 'Log ');
+		this->LogProcessBufferSize = (NumberOfCharactersRequired + 1) * sizeof(WCHAR);
+		this->LogProcessingBuffer = (WCHAR*) ExAllocatePoolZero(NonPagedPoolNx, this->LogProcessBufferSize, 'Log ');
 
 		if (this->LogProcessingBuffer == nullptr)
 		{
@@ -70,12 +70,11 @@ void Logger::Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArgumen
 	// Format the message and the arguments.
 	// 
 
-	if (vswprintf_s(this->LogProcessingBuffer, this->LogProcessBufferSize / sizeof(TCHAR), InFormat, InArguments) < 0)
+	if (vswprintf_s(this->LogProcessingBuffer, this->LogProcessBufferSize / sizeof(WCHAR), InFormat, InArguments) < 0)
 	{
 		KeReleaseSpinLock(&LogProcessingLock, OldIrql);
 		return;
 	}
-
 
 	// 
 	// Log the message.

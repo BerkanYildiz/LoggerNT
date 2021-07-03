@@ -42,7 +42,7 @@ private:
 	/// <summary>
 	/// The buffer used to store the formatted output.
 	/// </summary>
-	TCHAR* LogProcessingBuffer = nullptr;
+	WCHAR* LogProcessingBuffer = nullptr;
 
 	/// <summary>
 	/// The size of the buffer used to store the formatted output.
@@ -107,7 +107,7 @@ public:
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void Log(ELogLevel InLogLevel, const TCHAR* InFormat, ...);
+	void Log(ELogLevel InLogLevel, const WCHAR* InFormat, ...);
 	
 	/// <summary>
 	/// Logs a message of the specified log level.
@@ -115,7 +115,7 @@ public:
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="InArguments">The arguments for the message format.</param>
-	void Logv(ELogLevel InLogLevel, const TCHAR* InFormat, va_list InArguments);
+	void Logv(ELogLevel InLogLevel, const WCHAR* InFormat, va_list InArguments);
 
 public:
 
@@ -124,10 +124,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogTrace(const TCHAR* InFormat, ...)
+	void LogTrace(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Trace, InFormat, Arguments);
 	}
 
@@ -136,10 +136,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogDebug(const TCHAR* InFormat, ...)
+	void LogDebug(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Debug, InFormat, Arguments);
 	}
 
@@ -148,10 +148,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogInformation(const TCHAR* InFormat, ...)
+	void LogInformation(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Information, InFormat, Arguments);
 	}
 
@@ -160,10 +160,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogWarning(const TCHAR* InFormat, ...)
+	void LogWarning(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Warning, InFormat, Arguments);
 	}
 
@@ -172,10 +172,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogError(const TCHAR* InFormat, ...)
+	void LogError(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Error, InFormat, Arguments);
 	}
 
@@ -184,10 +184,10 @@ public:
 	/// </summary>
 	/// <param name="InFormat">The format of the message.</param>
 	/// <param name="...">The arguments for the message format.</param>
-	void LogFatal(const TCHAR* InFormat, ...)
+	void LogFatal(const WCHAR* InFormat, ...)
 	{
 		va_list Arguments;
-		__va_start(&Arguments, InFormat);
+		va_start(Arguments, InFormat);
 		Logv(ELogLevel::Fatal, InFormat, Arguments);
 	}
 };

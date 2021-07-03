@@ -6,8 +6,11 @@
 
 #include <ntdef.h>
 #include <ntifs.h>
+#include <vadefs.h>
 #include <tchar.h>
 #include <wdm.h>
+#include <stdio.h>
+#include <cstdarg>
 
 // 
 // Define the library globals.

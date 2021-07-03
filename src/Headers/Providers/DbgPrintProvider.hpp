@@ -22,11 +22,18 @@ public:
 		
 		ANSI_STRING AnsiMessage;
 		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, 'Log ');
+
+		if (AnsiMessage.Buffer == nullptr)
+			return;
+		
 		AnsiMessage.Length = 0;
 		AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength;
 		
 		if (!NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessage, &UnicodeMessage, false)))
+		{
+			ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
 			return;
+		}
 
 		// 
 		// Log the message.
