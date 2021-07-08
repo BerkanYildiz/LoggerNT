@@ -16,7 +16,7 @@
 #include <vadefs.h>
 #include <tchar.h>
 #include <wdm.h>
-#include <stdio.h>
+#include <ntstrsafe.h>
 #include <cstdarg>
 
 // 
