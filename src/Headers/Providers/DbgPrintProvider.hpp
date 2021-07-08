@@ -17,8 +17,8 @@ public:
 
 		UNICODE_STRING UnicodeMessage;
 		UnicodeMessage.Buffer = (PWCH) InMessage;
-		UnicodeMessage.Length = (USHORT) wcslen(InMessage);
-		UnicodeMessage.MaximumLength = UnicodeMessage.Length;
+		UnicodeMessage.Length = (USHORT) wcslen(InMessage) * 2;
+		UnicodeMessage.MaximumLength = UnicodeMessage.Length + 1;
 		
 		ANSI_STRING AnsiMessage;
 		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, 'Log ');
@@ -38,25 +38,25 @@ public:
 		// 
 		// Log the message.
 		// 
-		
+
 		switch (InLogLevel)
 		{
 			case ELogLevel::Trace:
 			case ELogLevel::Debug:
-				DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_TRACE_LEVEL, AnsiMessage.Buffer);
+				DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_TRACE_LEVEL, AnsiMessage.Buffer);
 				break;
 
 			case ELogLevel::Information:
-				DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_INFO_LEVEL, AnsiMessage.Buffer);
+				DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, AnsiMessage.Buffer);
 				break;
 
 			case ELogLevel::Warning:
-				DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_WARNING_LEVEL, AnsiMessage.Buffer);
+				DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_WARNING_LEVEL, AnsiMessage.Buffer);
 				break;
 
 			case ELogLevel::Error:
 			case ELogLevel::Fatal:
-				DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_ERROR_LEVEL, AnsiMessage.Buffer);
+				DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, AnsiMessage.Buffer);
 				break;
 		}
 
