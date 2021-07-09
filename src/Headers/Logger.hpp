@@ -132,8 +132,7 @@ public:
 		// 
 		// Calculate the number of bytes required for the formatting.
 		// 
-		
-		// auto const NumberOfCharactersRequired = _vscwprintf(InFormat, InArguments);
+
 		auto const NumberOfCharactersRequired = _vsnwprintf(nullptr, 0, InFormat, InArguments);
 
 		if (NumberOfCharactersRequired < 0)

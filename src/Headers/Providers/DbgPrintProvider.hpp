@@ -11,6 +11,39 @@ public:
 	/// <param name="InMessage">The message.</param>
 	void Log(ELogLevel InLogLevel, const WCHAR* InMessage) override
 	{
+		ANSI_STRING LevelPrefix;
+
+		switch (InLogLevel)
+		{
+			case ELogLevel::Trace:
+				RtlInitAnsiString(&LevelPrefix, " TRACE : ");
+				break;
+			
+			case ELogLevel::Debug:
+				RtlInitAnsiString(&LevelPrefix, " DEBUG : ");
+				break;
+			
+			case ELogLevel::Information:
+				RtlInitAnsiString(&LevelPrefix, "  INF  : ");
+				break;
+			
+			case ELogLevel::Warning:
+				RtlInitAnsiString(&LevelPrefix, "  WRN  : ");
+				break;
+			
+			case ELogLevel::Error:
+				RtlInitAnsiString(&LevelPrefix, " ERROR : ");
+				break;
+			
+			case ELogLevel::Fatal:
+				RtlInitAnsiString(&LevelPrefix, " FATAL : ");
+				break;
+
+			default:
+				RtlInitAnsiString(&LevelPrefix, "  UNK  : ");
+				break;
+		}
+		
 		// 
 		// Convert the UNICODE string to a ANSI string.
 		// 
@@ -21,19 +54,35 @@ public:
 		UnicodeMessage.MaximumLength = UnicodeMessage.Length + 1;
 		
 		ANSI_STRING AnsiMessage;
-		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, 'Log ');
+		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength + LevelPrefix.Length, 'Log ');
 
 		if (AnsiMessage.Buffer == nullptr)
 			return;
 		
 		AnsiMessage.Length = 0;
-		AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength;
+		AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength + LevelPrefix.Length;
+
+		// 
+		// Apply the conversion but leave some space at the beginning for the level prefix.
+		// 
+
+		ANSI_STRING AnsiMessageForConversion;
+		AnsiMessageForConversion.Buffer = (CHAR*) ((UINT64) AnsiMessage.Buffer + LevelPrefix.Length);
+		AnsiMessageForConversion.Length = 0;
+		AnsiMessageForConversion.MaximumLength = UnicodeMessage.MaximumLength;
 		
-		if (!NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessage, &UnicodeMessage, false)))
+		if (!NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessageForConversion, &UnicodeMessage, false)))
 		{
 			ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
 			return;
 		}
+
+		// 
+		// Copy the prefix at the beginning of the buffer.
+		// 
+
+		AnsiMessage.Length = AnsiMessageForConversion.Length + LevelPrefix.Length;
+		RtlCopyMemory(AnsiMessage.Buffer, LevelPrefix.Buffer, LevelPrefix.Length);
 
 		// 
 		// Log the message.
