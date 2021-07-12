@@ -1,1 +1,1 @@
-git submodule update --remote --merge ../
+git submodule update --recursive --remote ../
