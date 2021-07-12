@@ -76,7 +76,7 @@ public:
 	/// </summary>
 	/// <param name="InProvider">An existing instance of the logging provider.</param>
 	template <class TProvider>
-	bool AddProvider(OPTIONAL TProvider* InProvider = nullptr)
+	TProvider* AddProvider(OPTIONAL TProvider* InProvider = nullptr)
 	{
 		static_assert(__is_base_of(::ILogProvider, TProvider), "The logging provider is not based on ILogProvider");
 		
@@ -98,7 +98,7 @@ public:
 		KeAcquireSpinLock(&ProvidersLock, &OldIrql);
 		InterlockedExchangePointer((PVOID*) &Providers[InterlockedIncrement(&NumberOfProviders) - 1], InProvider);
 		KeReleaseSpinLock(&ProvidersLock, OldIrql);
-		return true;
+		return InProvider;
 	}
 	
 	/// <summary>

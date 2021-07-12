@@ -115,4 +115,13 @@ public:
 
 		ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
 	}
+
+	/// <summary>
+	/// Destroys this log provider.
+	/// </summary>
+	/// <param name="InLogger">The logger.</param>
+	void Exit(CONST class Logger* InLogger) override
+	{
+		UNREFERENCED_PARAMETER(InLogger);
+	}
 };

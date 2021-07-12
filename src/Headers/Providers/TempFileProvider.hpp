@@ -19,22 +19,6 @@ public:
 public:
 	
 	/// <summary>
-	/// Initializes a new instance of the <see cref="TempFileProvider"/> class.
-	/// </summary>
-	TempFileProvider() = default;
-	
-	/// <summary>
-	/// Initializes a new instance of the <see cref="TempFileProvider"/> class.
-	/// </summary>
-	/// <param name="InFilename">The filename.</param>
-	TempFileProvider(const WCHAR* InFilename)
-	{
-		UseFileNamed(InFilename);
-	}
-
-public:
-	
-	/// <summary>
 	/// Opens or creates a file with the specified name, in the temporary folder for system components.
 	/// </summary>
 	/// <param name="InFilename">The filename.</param>
@@ -56,9 +40,11 @@ public:
 
 		WCHAR UnicodeFileNameBuffer[MAXIMUM_FILENAME_LENGTH] = { };
 		UNICODE_STRING UnicodeFileName = { };
-
 		RtlInitEmptyUnicodeString(&UnicodeFileName, UnicodeFileNameBuffer, sizeof(UnicodeFileNameBuffer));
-		RtlAppendUnicodeToString(&UnicodeFileName, L"\\SystemRoot\\Temp\\");
+
+		if (wcschr(InFilename, L'\\') == nullptr)
+			RtlAppendUnicodeToString(&UnicodeFileName, L"\\SystemRoot\\Temp\\");
+		
 		RtlAppendUnicodeToString(&UnicodeFileName, InFilename);
 
 		// 
@@ -68,7 +54,7 @@ public:
 		NTSTATUS Status = { };
 		IO_STATUS_BLOCK IoStatusBlock = { };
 
-		OBJECT_ATTRIBUTES ObjectAttributes = { };
+		OBJECT_ATTRIBUTES ObjectAttributes;
 		InitializeObjectAttributes(&ObjectAttributes, &UnicodeFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 
 		if (!NT_SUCCESS(Status = ZwCreateFile(&FileHandle, GENERIC_WRITE | FILE_READ_ATTRIBUTES, &ObjectAttributes, &IoStatusBlock, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0)))
@@ -187,10 +173,13 @@ public:
 public:
 	
 	/// <summary>
-	/// Finalizes an instance of the <see cref="TempFileProvider"/> class.
+	/// Destroys this log provider.
 	/// </summary>
-	virtual ~TempFileProvider()
+	/// <param name="InLogger">The logger.</param>
+	void Exit(CONST class Logger* InLogger) override
 	{
+		UNREFERENCED_PARAMETER(InLogger);
+		
 		// 
 		// Close the handle if it is still open.
 		// 
