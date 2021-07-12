@@ -10,11 +10,10 @@ __interface ILogProvider
 	/// </summary>
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InMessage">The message.</param>
-	void Log(ELogLevel InLogLevel, const WCHAR* InMessage);
+	void Log(ELogLevel InLogLevel, CONST WCHAR* InMessage);
 
 	/// <summary>
 	/// Destroys this log provider.
 	/// </summary>
-	/// <param name="InLogger">The logger.</param>
-	void Exit(CONST class Logger* InLogger);
+	void Exit();
 };

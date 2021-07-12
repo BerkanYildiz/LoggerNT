@@ -22,7 +22,7 @@ public:
 	/// Opens or creates a file with the specified name, in the temporary folder for system components.
 	/// </summary>
 	/// <param name="InFilename">The filename.</param>
-	NTSTATUS UseFileNamed(const WCHAR* InFilename)
+	NTSTATUS UseFileNamed(CONST WCHAR* InFilename)
 	{
 		// 
 		// If a file was was already open...
@@ -83,7 +83,7 @@ public:
 	/// </summary>
 	/// <param name="InLogLevel">The severity.</param>
 	/// <param name="InMessage">The message.</param>
-	void Log(ELogLevel InLogLevel, const WCHAR* InMessage) override
+	void Log(ELogLevel InLogLevel, CONST WCHAR* InMessage) override
 	{
 		UNREFERENCED_PARAMETER(InLogLevel);
 		
@@ -175,11 +175,8 @@ public:
 	/// <summary>
 	/// Destroys this log provider.
 	/// </summary>
-	/// <param name="InLogger">The logger.</param>
-	void Exit(CONST class Logger* InLogger) override
+	void Exit() override
 	{
-		UNREFERENCED_PARAMETER(InLogger);
-		
 		// 
 		// Close the handle if it is still open.
 		// 
