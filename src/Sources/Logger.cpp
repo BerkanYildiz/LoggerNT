@@ -14,36 +14,6 @@ NTSTATUS LogInitLibrary(CONST LoggerConfig& InConfig)
 }
 
 /// <summary>
-/// Adds a logging provider to this logger instance.
-/// </summary>
-/// <param name="InProvider">An existing instance of the logging provider.</param>
-template <class TProvider>
-TProvider* LogAddProvider(OPTIONAL TProvider* InProvider)
-{
-	static_assert(__is_base_of(::ILogProvider, TProvider), "The logging provider is not based on ILogProvider");
-	
-	// 
-	// If a provider instance wasn't specified, create one.
-	// 
-
-	if (InProvider == nullptr)
-	{
-		InProvider = (TProvider*) ExAllocatePoolZero(NonPagedPoolNx, sizeof(TProvider), 'Log ');
-		InProvider = new(InProvider) TProvider();
-	}
-	
-	// 
-	// Add the provider to the list of providers.
-	// 
-
-	KIRQL OldIrql;
-	KeAcquireSpinLock(&ProvidersLock, &OldIrql);
-	InterlockedExchangePointer((PVOID*) &Providers[InterlockedIncrement(&NumberOfProviders) - 1], InProvider);
-	KeReleaseSpinLock(&ProvidersLock, OldIrql);
-	return InProvider;
-}
-
-/// <summary>
 /// Logs a message of the specified log level.
 /// </summary>
 /// <param name="InLogLevel">The severity.</param>
