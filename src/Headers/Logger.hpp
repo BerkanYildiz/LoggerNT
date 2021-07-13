@@ -60,7 +60,7 @@ NTSTATUS LogInitLibrary(CONST LoggerConfig& InConfig);
 /// </summary>
 /// <param name="InProvider">An existing instance of the logging provider.</param>
 template <class TProvider>
-TProvider* LogAddProvider(OPTIONAL TProvider* InProvider)
+TProvider* LogAddProvider(OPTIONAL TProvider* InProvider = nullptr)
 {
 	static_assert(__is_base_of(::ILogProvider, TProvider), "The logging provider is not based on ILogProvider");
 	
