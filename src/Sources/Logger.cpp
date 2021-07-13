@@ -1,5 +1,5 @@
-#define INCLUDE_LOGGER_PRIVATE
 #include "../Headers/LoggerNT.h"
+using namespace LoggerNT;
 
 /// <summary>
 /// Initializes the LoggerNT library.
@@ -7,8 +7,13 @@
 /// <param name="InConfig">The configuration.</param>
 NTSTATUS LogInitLibrary(CONST LoggerConfig& InConfig)
 {
-	KeInitializeSpinLock(&ProvidersLock);
-	KeInitializeSpinLock(&LogProcessingLock);
+	if (IsSetup == FALSE)
+	{
+		KeInitializeSpinLock(&ProvidersLock);
+		KeInitializeSpinLock(&LogProcessingLock);
+		IsSetup = TRUE;
+	}
+
 	Config = InConfig;
 	return STATUS_SUCCESS;
 }
@@ -135,7 +140,7 @@ void LogDebug(CONST WCHAR* InFormat, ...)
 /// </summary>
 /// <param name="InFormat">The format of the message.</param>
 /// <param name="...">The arguments for the message format.</param>
-void LogInformation(CONST WCHAR* InFormat, ...)
+void LogInfo(CONST WCHAR* InFormat, ...)
 {
 	va_list Arguments;
 	va_start(Arguments, InFormat);

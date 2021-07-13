@@ -6,49 +6,48 @@ inline void* __cdecl operator new(size_t size, void* location)
 	return location;
 }
 
-#ifdef INCLUDE_LOGGER_PRIVATE
+namespace LoggerNT
+{
+	/// <summary>
+	/// The configuration of the logging system.
+	/// </summary>
+	inline LoggerConfig Config = { };
 
-/// <summary>
-/// The configuration of the logging system.
-/// </summary>
-inline LoggerConfig Config = { };
+	/// <summary>
+	/// Whether this class has been setup or not.
+	/// </summary>
+	inline BOOLEAN IsSetup = FALSE;
 
-/// <summary>
-/// Whether this class has been setup or not.
-/// </summary>
-inline BOOLEAN IsSetup = FALSE;
+	/// <summary>
+	/// The synchronization spin lock for the providers list.
+	/// </summary>
+	inline KSPIN_LOCK ProvidersLock = { };
 
-/// <summary>
-/// The synchronization spin lock for the providers list.
-/// </summary>
-inline KSPIN_LOCK ProvidersLock = { };
+	/// <summary>
+	/// The list of providers currently used by this logger.
+	/// </summary>
+	inline ILogProvider* Providers[16] = { };
 
-/// <summary>
-/// The list of providers currently used by this logger.
-/// </summary>
-inline ILogProvider* Providers[16] = { };
+	/// <summary>
+	/// The number of entries in the list of providers.
+	/// </summary>
+	inline LONG NumberOfProviders = 0;
 
-/// <summary>
-/// The number of entries in the list of providers.
-/// </summary>
-inline LONG NumberOfProviders = 0;
+	/// <summary>
+	/// The synchronization spin lock for log processing.
+	/// </summary>
+	inline KSPIN_LOCK LogProcessingLock = { };
 
-/// <summary>
-/// The synchronization spin lock for log processing.
-/// </summary>
-inline KSPIN_LOCK LogProcessingLock = { };
+	/// <summary>
+	/// The buffer used to store the formatted output.
+	/// </summary>
+	inline WCHAR* LogProcessingBuffer = nullptr;
 
-/// <summary>
-/// The buffer used to store the formatted output.
-/// </summary>
-inline WCHAR* LogProcessingBuffer = nullptr;
-
-/// <summary>
-/// The size of the buffer used to store the formatted output.
-/// </summary>
-inline SIZE_T LogProcessBufferSize = 0;
-
-#endif
+	/// <summary>
+	/// The size of the buffer used to store the formatted output.
+	/// </summary>
+	inline SIZE_T LogProcessBufferSize = 0;
+}
 
 /// <summary>
 /// Initializes the LoggerNT library.
@@ -80,9 +79,9 @@ TProvider* LogAddProvider(OPTIONAL TProvider* InProvider)
 	// 
 
 	KIRQL OldIrql;
-	KeAcquireSpinLock(&ProvidersLock, &OldIrql);
-	InterlockedExchangePointer((PVOID*) &Providers[InterlockedIncrement(&NumberOfProviders) - 1], InProvider);
-	KeReleaseSpinLock(&ProvidersLock, OldIrql);
+	KeAcquireSpinLock(&LoggerNT::ProvidersLock, &OldIrql);
+	InterlockedExchangePointer((PVOID*) &LoggerNT::Providers[InterlockedIncrement(&LoggerNT::NumberOfProviders) - 1], InProvider);
+	KeReleaseSpinLock(&LoggerNT::ProvidersLock, OldIrql);
 	return InProvider;
 }
 
@@ -121,7 +120,7 @@ void LogDebug(CONST WCHAR* InFormat, ...);
 /// </summary>
 /// <param name="InFormat">The format of the message.</param>
 /// <param name="...">The arguments for the message format.</param>
-void LogInformation(CONST WCHAR* InFormat, ...);
+void LogInfo(CONST WCHAR* InFormat, ...);
 
 /// <summary>
 /// Logs a message with the 'Warning' severity level.
