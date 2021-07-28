@@ -50,12 +50,12 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 	KeAcquireSpinLock(&LogProcessingLock, &OldIrql);
 
 	if (LogProcessingBuffer == nullptr ||
-		LogProcessBufferSize < (NumberOfCharactersRequired + 1) * sizeof(WCHAR))
+		LogProcessBufferSize < (NumberOfCharactersRequired + 2) * sizeof(WCHAR))
 	{
 		if (LogProcessingBuffer != nullptr)
 			ExFreePoolWithTag(LogProcessingBuffer, 'Log ');
 		
-		LogProcessBufferSize = (NumberOfCharactersRequired + 1) * sizeof(WCHAR);
+		LogProcessBufferSize = (NumberOfCharactersRequired + 2) * sizeof(WCHAR);
 		LogProcessingBuffer = (WCHAR*) ExAllocatePoolZero(NonPagedPoolNx, LogProcessBufferSize, 'Log ');
 
 		if (LogProcessingBuffer == nullptr)
@@ -81,6 +81,13 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 		return;
 	}
 
+	// 
+	// Append a break-line at the end of the message.
+	// 
+
+	LogProcessingBuffer[NumberOfCharactersRequired] = L'\n';
+	LogProcessingBuffer[NumberOfCharactersRequired + 1] = L'\0';
+	
 	// 
 	// Log the message.
 	// 

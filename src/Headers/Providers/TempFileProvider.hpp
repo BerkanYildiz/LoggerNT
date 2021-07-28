@@ -104,6 +104,43 @@ public:
 			KeLowerIrql(PASSIVE_LEVEL);
 
 		// 
+		// Select the correct prefix for this log level.
+		// 
+
+		ANSI_STRING LevelPrefix;
+
+		switch (InLogLevel)
+		{
+			case ELogLevel::Trace:
+				RtlInitAnsiString(&LevelPrefix, " TRACE : ");
+				break;
+			
+			case ELogLevel::Debug:
+				RtlInitAnsiString(&LevelPrefix, " DEBUG : ");
+				break;
+			
+			case ELogLevel::Information:
+				RtlInitAnsiString(&LevelPrefix, "  INF  : ");
+				break;
+			
+			case ELogLevel::Warning:
+				RtlInitAnsiString(&LevelPrefix, "  WRN  : ");
+				break;
+			
+			case ELogLevel::Error:
+				RtlInitAnsiString(&LevelPrefix, " ERROR : ");
+				break;
+			
+			case ELogLevel::Fatal:
+				RtlInitAnsiString(&LevelPrefix, " FATAL : ");
+				break;
+
+			default:
+				RtlInitAnsiString(&LevelPrefix, "  UNK  : ");
+				break;
+		}
+
+		// 
 		// If we have to write the logs in ANSI format, then...
 		// 
 

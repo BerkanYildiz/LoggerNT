@@ -11,6 +11,10 @@ public:
 	/// <param name="InMessage">The message.</param>
 	void Log(ELogLevel InLogLevel, CONST WCHAR* InMessage) override
 	{
+		// 
+		// Select the correct prefix for this log level.
+		// 
+		
 		ANSI_STRING LevelPrefix;
 
 		switch (InLogLevel)
