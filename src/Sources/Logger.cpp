@@ -37,7 +37,7 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 	// Calculate the number of bytes required for the formatting.
 	// 
 
-	auto CONST NumberOfCharactersRequired = _vsnwprintf(nullptr, 0, InFormat, InArguments);
+	auto const NumberOfCharactersRequired = _vsnwprintf(nullptr, 0, InFormat, InArguments);
 
 	if (NumberOfCharactersRequired < 0)
 		return;
@@ -75,7 +75,7 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 	// Format the message and the arguments.
 	// 
 
-	if (vswprintf_s(LogProcessingBuffer, LogProcessBufferSize / sizeof(WCHAR), InFormat, InArguments) < 0)
+	if (vswprintf_s(LogProcessingBuffer, LogProcessBufferSize / sizeof(*InFormat), InFormat, InArguments) < 0)
 	{
 		KeReleaseSpinLock(&LogProcessingLock, OldIrql);
 		return;
@@ -91,9 +91,8 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 	// 
 	// Log the message.
 	// 
-
-	KIRQL OldIrqlBis;
-	KeAcquireSpinLock(&ProvidersLock, &OldIrqlBis);
+	
+	KeAcquireSpinLockAtDpcLevel(&ProvidersLock);
 
 	for (LONG ProviderIdx = 0; ProviderIdx < NumberOfProviders; ++ProviderIdx)
 	{
@@ -101,7 +100,7 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 			Provider->Log(InLogLevel, LogProcessingBuffer);
 	}
 
-	KeReleaseSpinLock(&ProvidersLock, OldIrqlBis);
+	KeReleaseSpinLockFromDpcLevel(&ProvidersLock),
 	KeReleaseSpinLock(&LogProcessingLock, OldIrql);
 }
 

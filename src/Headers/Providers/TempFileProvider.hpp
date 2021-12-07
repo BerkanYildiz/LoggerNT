@@ -100,7 +100,7 @@ public:
 
 		auto const OldIrql = KeGetCurrentIrql();
 
-		if (OldIrql != PASSIVE_LEVEL)
+		if (OldIrql > PASSIVE_LEVEL)
 			KeLowerIrql(PASSIVE_LEVEL);
 
 		// 
@@ -139,6 +139,15 @@ public:
 				RtlInitAnsiString(&LevelPrefix, "  UNK  : ");
 				break;
 		}
+
+		// 
+		// Make sure special kernel APCs that are queued will be executed.
+		// 
+
+		BOOLEAN WereSpecialApcsDisabled = KeAreAllApcsDisabled();
+
+		if (WereSpecialApcsDisabled)
+			KeLeaveGuardedRegion();
 
 		// 
 		// If we have to write the logs in ANSI format, then...
@@ -200,10 +209,17 @@ public:
 		}
 
 		// 
+		// Revert the enabling of special kernel APCs delivery.
+		// 
+
+		if (WereSpecialApcsDisabled)
+			KeEnterGuardedRegion();
+
+		// 
 		// Revert the IRQL back to its original level.
 		// 
 
-		if (OldIrql != PASSIVE_LEVEL)
+		if (OldIrql > PASSIVE_LEVEL)
 			KfRaiseIrql(OldIrql);
 	}
 
