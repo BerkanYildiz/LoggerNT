@@ -165,7 +165,7 @@ public:
 			UnicodeMessage.MaximumLength = UnicodeMessage.Length + (1 * sizeof(WCHAR));
 			
 			ANSI_STRING AnsiMessage;
-			AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, 'Log ');
+			AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, LOGGER_NT_POOL_TAG);
 			AnsiMessage.Length = 0;
 			AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength;
 			
@@ -185,7 +185,7 @@ public:
 			// Release the memory allocated for the conversion.
 			// 
 
-			ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
+			ExFreePoolWithTag(AnsiMessage.Buffer, LOGGER_NT_POOL_TAG);
 		}
 		else
 		{

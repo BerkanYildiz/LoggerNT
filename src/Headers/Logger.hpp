@@ -70,7 +70,7 @@ TProvider* LogAddProvider(OPTIONAL TProvider* InProvider = nullptr)
 
 	if (InProvider == nullptr)
 	{
-		InProvider = (TProvider*) ExAllocatePoolZero(NonPagedPoolNx, sizeof(TProvider), 'Log ');
+		InProvider = (TProvider*) ExAllocatePoolZero(NonPagedPoolNx, sizeof(TProvider), LOGGER_NT_POOL_TAG);
 		InProvider = new(InProvider) TProvider();
 	}
 	

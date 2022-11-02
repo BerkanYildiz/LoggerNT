@@ -53,10 +53,10 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 		LogProcessBufferSize < (NumberOfCharactersRequired + 2) * sizeof(WCHAR))
 	{
 		if (LogProcessingBuffer != nullptr)
-			ExFreePoolWithTag(LogProcessingBuffer, 'Log ');
+			ExFreePoolWithTag(LogProcessingBuffer, LOGGER_NT_POOL_TAG);
 		
 		LogProcessBufferSize = (NumberOfCharactersRequired + 2) * sizeof(WCHAR);
-		LogProcessingBuffer = (WCHAR*) ExAllocatePoolZero(NonPagedPoolNx, LogProcessBufferSize, 'Log ');
+		LogProcessingBuffer = (WCHAR*) ExAllocatePoolZero(NonPagedPoolNx, LogProcessBufferSize, LOGGER_NT_POOL_TAG);
 
 		if (LogProcessingBuffer == nullptr)
 		{

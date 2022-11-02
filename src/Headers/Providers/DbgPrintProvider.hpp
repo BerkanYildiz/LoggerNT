@@ -58,7 +58,7 @@ public:
 		UnicodeMessage.MaximumLength = UnicodeMessage.Length + 1;
 		
 		ANSI_STRING AnsiMessage;
-		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength + LevelPrefix.Length, 'Log ');
+		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength + LevelPrefix.Length, LOGGER_NT_POOL_TAG);
 
 		if (AnsiMessage.Buffer == nullptr)
 			return;
@@ -77,7 +77,7 @@ public:
 		
 		if (!NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessageForConversion, &UnicodeMessage, false)))
 		{
-			ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
+			ExFreePoolWithTag(AnsiMessage.Buffer, LOGGER_NT_POOL_TAG);
 			return;
 		}
 
@@ -117,7 +117,7 @@ public:
 		// Release the memory allocated for the conversion.
 		// 
 
-		ExFreePoolWithTag(AnsiMessage.Buffer, 'Log ');
+		ExFreePoolWithTag(AnsiMessage.Buffer, LOGGER_NT_POOL_TAG);
 	}
 
 	/// <summary>

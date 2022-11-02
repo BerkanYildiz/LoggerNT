@@ -17,6 +17,7 @@
 #define LOGGER_NT_VERSION_MAJOR 1
 #define LOGGER_NT_VERSION_MINOR 1
 #define LOGGER_NT_VERSION_BUILD 0
+#define LOGGER_NT_POOL_TAG 0
 
 // 
 // Include the library headers.
