@@ -11,4 +11,5 @@ enum class ELogLevel : unsigned int
 	Warning = 3,
 	Error = 4,
 	Fatal = 5,
+	Disabled = 6,
 };
