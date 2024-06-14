@@ -39,7 +39,7 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 
 	auto const NumberOfCharactersRequired = _vsnwprintf(nullptr, 0, InFormat, InArguments);
 
-	if (NumberOfCharactersRequired < 0)
+	if (NumberOfCharactersRequired <= 0)
 		return;
 
 	// 
@@ -75,7 +75,7 @@ void Logv(ELogLevel InLogLevel, CONST WCHAR* InFormat, va_list InArguments)
 	// Format the message and the arguments.
 	// 
 
-	if (vswprintf_s(LogProcessingBuffer, LogProcessBufferSize / sizeof(*InFormat), InFormat, InArguments) < 0)
+	if (vswprintf_s(LogProcessingBuffer, LogProcessBufferSize / sizeof(*InFormat), InFormat, InArguments) <= 0)
 	{
 		KeReleaseSpinLock(&LogProcessingLock, OldIrql);
 		return;
