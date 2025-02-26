@@ -57,23 +57,7 @@ public:
 		OBJECT_ATTRIBUTES ObjectAttributes;
 		InitializeObjectAttributes(&ObjectAttributes, &UnicodeFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 
-		if (!NT_SUCCESS(Status = ZwCreateFile(&FileHandle, GENERIC_WRITE | FILE_READ_ATTRIBUTES, &ObjectAttributes, &IoStatusBlock, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0)))
-			return Status;
-
-		// 
-		// Seek to the end of the file.
-		// 
-
-		FILE_STANDARD_INFORMATION FileInformation = { };
-
-		if (NT_SUCCESS(Status = ZwQueryInformationFile(FileHandle, &IoStatusBlock, &FileInformation, sizeof(FILE_STANDARD_INFORMATION), FileStandardInformation)))
-		{
-			FILE_POSITION_INFORMATION FilePositionInformation = { };
-			FilePositionInformation.CurrentByteOffset = FileInformation.EndOfFile;
-			Status = ZwSetInformationFile(FileHandle, &IoStatusBlock, &FilePositionInformation, sizeof(FILE_POSITION_INFORMATION), ::FilePositionInformation);
-		}
-
-		return STATUS_SUCCESS;
+		return ZwCreateFile(&FileHandle, FILE_APPEND_DATA | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
 	}
 
 public:
@@ -85,8 +69,6 @@ public:
 	/// <param name="InMessage">The message.</param>
 	void Log(ELogLevel InLogLevel, CONST WCHAR* InMessage) override
 	{
-		UNREFERENCED_PARAMETER(InLogLevel);
-		
 		// 
 		// If no file was selected, we cannot do anything.
 		// 
