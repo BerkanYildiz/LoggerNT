@@ -41,6 +41,7 @@
     <ClInclude Include="Headers\LoggerNT.h" />
     <ClInclude Include="Headers\LogLevel.hpp" />
     <ClInclude Include="Headers\LogProvider.hpp" />
+    <ClInclude Include="Headers\Providers\SerialPortProvider.hpp" />
     <ClInclude Include="Headers\Providers\TempFileProvider.hpp" />
   </ItemGroup>
   <ItemGroup>

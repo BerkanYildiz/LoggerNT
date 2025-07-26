@@ -34,3 +34,4 @@
 
 #include "Providers/DbgPrintProvider.hpp"
 #include "Providers/TempFileProvider.hpp"
+#include "Providers/SerialPortProvider.hpp"
