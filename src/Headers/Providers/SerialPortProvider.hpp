@@ -18,39 +18,63 @@ public:
 		switch (InLogLevel)
 		{
 			case ELogLevel::Trace:
-				SerialWrite(L"   TRACE   :  ", 14);
+				SerialWrite("   TRACE   :  ", 14);
 				break;
 			
 			case ELogLevel::Debug:
-				SerialWrite(L"   DEBUG   :  ", 14);
+				SerialWrite("   DEBUG   :  ", 14);
 				break;
 			
 			case ELogLevel::Information:
-				SerialWrite(L"    INF    :  ", 14);
+				SerialWrite("    INF    :  ", 14);
 				break;
 			
 			case ELogLevel::Warning:
-				SerialWrite(L"    WRN    :  ", 14);
+				SerialWrite("    WRN    :  ", 14);
 				break;
 			
 			case ELogLevel::Error:
-				SerialWrite(L"   ERROR   :  ", 14);
+				SerialWrite("   ERROR   :  ", 14);
 				break;
 			
 			case ELogLevel::Fatal:
-				SerialWrite(L"   FATAL   :  ", 14);
+				SerialWrite("   FATAL   :  ", 14);
 				break;
 
 			default:
-                SerialWrite(L"    UNK    :  ", 14);
+                SerialWrite("    UNK    :  ", 14);
 				break;
 		}
 
-		//
-		// Write the message.
+        // 
+		// Convert the UNICODE string to an ANSI string.
 		// 
 
-		SerialWrite(InMessage, wcslen(InMessage));
+		UNICODE_STRING UnicodeMessage;
+		UnicodeMessage.Buffer = (PWCH) InMessage;
+		UnicodeMessage.Length = (USHORT) wcslen(InMessage) * sizeof(WCHAR);
+		UnicodeMessage.MaximumLength = UnicodeMessage.Length + sizeof(WCHAR);
+		
+		ANSI_STRING AnsiMessage;
+		AnsiMessage.Buffer = (PCHAR) ExAllocatePoolZero(NonPagedPoolNx, UnicodeMessage.MaximumLength, LOGGER_NT_POOL_TAG);
+		AnsiMessage.Length = 0;
+		AnsiMessage.MaximumLength = UnicodeMessage.MaximumLength;
+		
+		if (NT_SUCCESS(RtlUnicodeStringToAnsiString(&AnsiMessage, &UnicodeMessage, false)))
+		{
+			//
+			// Write the message.
+			// 
+
+			SerialWrite(AnsiMessage.Buffer, AnsiMessage.Length);
+		}
+
+		// 
+		// Release the memory allocated for the conversion.
+		// 
+
+		ExFreePoolWithTag(AnsiMessage.Buffer, LOGGER_NT_POOL_TAG);
+
 	}
 
 	/// <summary>
@@ -63,8 +87,14 @@ public:
 
 private:
 
-	static void SerialWrite(CONST WCHAR* InBuffer, ULONG InLength)
+	static void SerialWrite(CONST CHAR* InBuffer, SIZE_T InLength)
 	{
-		WRITE_PORT_BUFFER_UCHAR((PUCHAR) 0x3F8, (PUCHAR) InBuffer, InLength * 2);
+		WRITE_PORT_BUFFER_UCHAR((PUCHAR) 0x3F8, (PUCHAR) InBuffer, (ULONG) InLength);
+    }
+
+	static void SerialWrite(CONST WCHAR* InBuffer, SIZE_T InLength)
+	{
+		for (SIZE_T Idx = 0; Idx < InLength; ++Idx)
+		    WRITE_PORT_UCHAR((PUCHAR) 0x3F8, (InBuffer[Idx] < 0x80) ? (UCHAR) InBuffer[Idx] : '?');
     }
 };
